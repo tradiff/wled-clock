@@ -513,18 +513,25 @@ static const char _data_FX_MODE_DUAL_SCAN[] PROGMEM = "Scan Dual@!,# of dots,,,,
  * Cycles all LEDs at once through a rainbow.
  */
 uint16_t mode_rainbow(void) {
-  unsigned counter = (strip.now * ((SEGMENT.speed >> 2) +2)) & 0xFFFF;
+  // travis: updated to use intensity as a slowness factor, to further slow the animation down
+  // original:
+  // unsigned counter = (strip.now * ((SEGMENT.speed >> 2) +2)) & 0xFFFF;
+  // counter = counter >> 8;
+
+  // if (SEGMENT.intensity < 128){
+  //   SEGMENT.fill(color_blend(SEGMENT.color_wheel(counter),WHITE,uint8_t(128-SEGMENT.intensity)));
+  // } else {
+  //   SEGMENT.fill(SEGMENT.color_wheel(counter));
+  // }
+
+  unsigned counter = (strip.now / SEGMENT.intensity * ((SEGMENT.speed >> 2) +2)) & 0xFFFF;
   counter = counter >> 8;
 
-  if (SEGMENT.intensity < 128){
-    SEGMENT.fill(color_blend(SEGMENT.color_wheel(counter),WHITE,uint8_t(128-SEGMENT.intensity)));
-  } else {
-    SEGMENT.fill(SEGMENT.color_wheel(counter));
-  }
+  SEGMENT.fill(SEGMENT.color_wheel(counter));
 
   return FRAMETIME;
 }
-static const char _data_FX_MODE_RAINBOW[] PROGMEM = "Colorloop@!,Saturation;;!;01";
+static const char _data_FX_MODE_RAINBOW[] PROGMEM = "Colorloop@!,Slowness Factor;;!;01";
 
 
 /*
